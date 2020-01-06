@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"time"
 
 	"github.com/dghubble/sling"
 	"github.com/gofrs/uuid"
@@ -36,7 +37,58 @@ type Issue struct {
 
 func main() {
 	// printer()
-	converterClient()
+	// converterClient()
+	tesst()
+}
+
+
+func tesst() {
+	ts := [...]float32{7,-10,13,8,4,-7.2,-12,-3.7,3.5,-9.6,6.5,-1.7,-6.2,7,0.5}
+	var max float32 = ts[0]
+	var min float32 = ts[0]
+	var pos  []float32
+	var neg  []float32
+
+	for _, value := range ts {
+        if max < value {
+            max = value
+        }
+        if min > value {
+            min = value
+        }
+    }
+
+	for _,val := range ts{
+		
+		if val <= max && val >= min {
+	        if val > 0 {
+	            pos = append(pos,val)
+	        } else {
+	            neg = append(neg,val)
+	        }
+    	}
+	}
+
+	minPos := pos[0]
+	maxNeg := neg[0]
+
+	for _, valp := range pos {
+        if minPos > valp {
+            minPos = valp
+        }
+    }
+
+    for _, valn := range neg {
+        if maxNeg < valn {
+            maxNeg = valn
+        }
+    }
+
+    if minPos > (-1)*maxNeg {
+    	fmt.Println(maxNeg)
+    } else {
+    	fmt.Println(minPos)
+    }
 }
 
 func printer() {
@@ -75,6 +127,11 @@ func printer() {
 // nous puissions les définir sur n'importe quel type qui implémente une Write()méthode
 
 // time.Date(time.Now().Year(), time.Now().Month())
+
+func showTimes(){
+	now := time.Now().Local()
+	fmt.Println(now)
+}
 
 func monitor() {
 	cmd := exec.Command("pwd")
