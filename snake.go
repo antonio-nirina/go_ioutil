@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/dghubble/sling"
 	"github.com/gofrs/uuid"
 )
 
@@ -26,6 +27,11 @@ type Inputs struct {
 type Model struct {
 	FileName string `json:"file_name"`
 	FileUrl  string `json:"file_url"`
+}
+
+type Issue struct {
+	Title string `json:"title"`
+	Body  string `json:"body"`
 }
 
 func main() {
@@ -117,4 +123,12 @@ func converterClient() {
 	body, err := ioutil.ReadAll(resp.Body)
 
 	fmt.Println(string(body))
+}
+
+func checkSl() {
+	githubBase := sling.New().Base("https://api.github.com/").Client(httpClient)
+	path := fmt.Sprintf("repos/%s/%s/issues", owner, repo)
+	issues := new([]Issue)
+	resp, err := githubBase.New().Get(path).QueryStruct(params).ReceiveSuccess(issues)
+	fmt.Println(issues, resp, err)
 }
