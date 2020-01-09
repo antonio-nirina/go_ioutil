@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -9,10 +10,13 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"time"
 
-	"github.com/dghubble/sling"
+	// "github.com/dghubble/sling"
 	"github.com/gofrs/uuid"
+	"github.com/gorilla/mux"
+	// "github.com/nsf/termbox-go"
 )
 
 const (
@@ -35,60 +39,126 @@ type Issue struct {
 	Body  string `json:"body"`
 }
 
-func main() {
-	// printer()
-	// converterClient()
-	tesst()
+type Env struct {
+	FichierDonnees Info   `json:"fichier_donnees"`
+	TypeEnveloppe  string `json:"type_enveloppe"`
 }
 
+type Info struct {
+	Format        string `json:"format"`
+	ContenuBase64 string `json:"contenu_base64"`
+}
+
+func main() {
+	// printer()
+	Init()
+}
+
+func HomeHandler(w http.ResponseWriter, r *http.Request) {
+	env := Env{}
+	// info := Info{}
+	err := json.NewDecoder(r.Body).Decode(&env)
+
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	file, err := base64.StdEncoding.DecodeString(env.FichierDonnees.ContenuBase64)
+
+	if err != nil {
+		fmt.Println("decode error:", err)
+		return
+	}
+	path := fmt.Sprintf("%s%s", filepath.Dir(""), "/fichier/")
+	filInfo, _ := os.Stat(path)
+
+	if filInfo == nil {
+		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+			fmt.Println("contact_in_adminstartor")
+		}
+
+		out, err := os.Create(path)
+
+		if err != nil {
+			fmt.Println("contact_in_adminstartor")
+		}
+		defer out.Close()
+		err = out.Chmod(0644)
+	}
+
+	u2, err := uuid.NewV4()
+
+	if err != nil {
+		fmt.Println("contact_in_adminstartor")
+	}
+
+	filename := fmt.Sprintf("%s%s", u2, env.FichierDonnees.Format)
+	f, err := os.OpenFile("fichier/"+filename, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
+
+	if err != nil {
+		fmt.Println("contact_in_adminstartor")
+	}
+	// don't forget to close it
+	defer f.Close()
+
+	fmt.Println(file)
+	//if os.IsNotExist(err) {
+
+	// }
+
+	/*response, err := json.Marshal(payload)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	w.Write([]byte(response))*/
+}
+
+func Init() {
+	r := mux.NewRouter()
+	r.HandleFunc("/", HomeHandler).Methods("POST")
+	fmt.Println("Run in 8080")
+	log.Fatal(http.ListenAndServe(":8080", r))
+}
 
 func tesst() {
-	ts := [...]float32{7,-10,13,8,4,-7.2,-12,-3.7,3.5,-9.6,6.5,-1.7,-6.2,7,0.5}
-	var max float32 = ts[0]
-	var min float32 = ts[0]
-	var pos  []float32
-	var neg  []float32
+	ts := [...]float32{7, -10, 13, 8, 4, -7.2, -12, -3.7, 3.5, -9.6, 6.5, -1.7, -6.2, 7, 0.5, -0.3}
+	var pos []float32
+	var neg []float32
 
-	for _, value := range ts {
-        if max < value {
-            max = value
-        }
-        if min > value {
-            min = value
-        }
-    }
+	for _, val := range ts {
+		if val > 0 {
+			pos = append(pos, val)
+		} else {
+			neg = append(neg, val)
+		}
 
-	for _,val := range ts{
-		
-		if val <= max && val >= min {
-	        if val > 0 {
-	            pos = append(pos,val)
-	        } else {
-	            neg = append(neg,val)
-	        }
-    	}
 	}
 
 	minPos := pos[0]
 	maxNeg := neg[0]
 
 	for _, valp := range pos {
-        if minPos > valp {
-            minPos = valp
-        }
-    }
+		if minPos > valp {
+			minPos = valp
+		}
+	}
 
-    for _, valn := range neg {
-        if maxNeg < valn {
-            maxNeg = valn
-        }
-    }
+	for _, valn := range neg {
+		if maxNeg < valn {
+			maxNeg = valn
+		}
+	}
 
-    if minPos > (-1)*maxNeg {
-    	fmt.Println(maxNeg)
-    } else {
-    	fmt.Println(minPos)
-    }
+	if minPos > (-1)*maxNeg {
+		fmt.Println(maxNeg)
+	} else {
+		fmt.Println(minPos)
+	}
 }
 
 func printer() {
@@ -128,7 +198,7 @@ func printer() {
 
 // time.Date(time.Now().Year(), time.Now().Month())
 
-func showTimes(){
+func showTimes() {
 	now := time.Now().Local()
 	fmt.Println(now)
 }
@@ -141,11 +211,11 @@ func monitor() {
 	if err != nil {
 		log.Fatalf("cmd.Run() failed with %s\n", err)
 	}
-	fmt.Println(string(out1))
+	fmt.Println(string(out))
 }
 
 func converterClient() {
-	fileName := "067b77b3-c18e-4bd0-b4f1-e7e63020812c16-12-2019.docx"
+	fileName := "test_converter.docx"
 	bucket := "sp-files-to-convert"
 	method := "POST"
 	uri := fmt.Sprintf("%s%s%s%s", URL_S3, bucket, "/", fileName)
@@ -182,10 +252,10 @@ func converterClient() {
 	fmt.Println(string(body))
 }
 
-func checkSl() {
+/*func checkSl() {
 	githubBase := sling.New().Base("https://api.github.com/").Client(httpClient)
 	path := fmt.Sprintf("repos/%s/%s/issues", owner, repo)
 	issues := new([]Issue)
 	resp, err := githubBase.New().Get(path).QueryStruct(params).ReceiveSuccess(issues)
 	fmt.Println(issues, resp, err)
-}
+}*/

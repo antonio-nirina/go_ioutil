@@ -9,9 +9,9 @@ import (
 
 func InitFile() {
 	// path := "/home/nirina/Documents/golang/example/var/"
-	path := fmt.Sprintf("%s%s", filepath.Dir(""), "/var/") 
+	path := fmt.Sprintf("%s%s", filepath.Dir(""), "/var/")
 	if !fileExists(path) {
-		mkdirForFile(path)	
+		mkdirForFile(path)
 	}
 	createFile()
 	// fmt.Println(path)
@@ -52,7 +52,7 @@ func fileExists(name string) bool {
 }
 
 // CreateFile in directory
-func createFile () {
+func createFile() {
 	f, err := os.OpenFile("var/info.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
 		fmt.Printf("error opening file: %v", err)
