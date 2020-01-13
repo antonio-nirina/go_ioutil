@@ -16,7 +16,7 @@ const baseURL = "https://api.github.com/"
 
 // Issue is a simplified Github issue
 // https://developer.github.com/v3/issues/#response
-type Issue struct {
+type Issuea struct {
 	ID     int    `json:"id"`
 	URL    string `json:"url"`
 	Number int    `json:"number"`

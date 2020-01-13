@@ -6,7 +6,7 @@ import (
 )
 
 
-func Info(op string, args ...interface{}) {
+func InfoA(op string, args ...interface{}) {
 	log.SetFormatter(&log.JSONFormatter{})
 	log.WithFields(log.Fields{
     "op": op,

@@ -3,8 +3,10 @@ package main
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -12,6 +14,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"time"
+	//"runtime"
 
 	// "github.com/dghubble/sling"
 	"github.com/gofrs/uuid"
@@ -49,6 +52,11 @@ type Info struct {
 	ContenuBase64 string `json:"contenu_base64"`
 }
 
+type Resp struct {
+	Code int `json:"code"`
+	Message string `json:"message"`
+}
+
 func main() {
 	// printer()
 	Init()
@@ -56,7 +64,7 @@ func main() {
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	env := Env{}
-	// info := Info{}
+	resp := Resp{}
 	err := json.NewDecoder(r.Body).Decode(&env)
 
 	if err != nil {
@@ -73,14 +81,14 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	filInfo, _ := os.Stat(path)
 
 	if filInfo == nil {
-		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
-			fmt.Println("contact_in_adminstartor")
+		if err = os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+			fmt.Println("contact_in_adminstartor1")
 		}
 
 		out, err := os.Create(path)
 
 		if err != nil {
-			fmt.Println("contact_in_adminstartor")
+			fmt.Println("contact_in_adminstartor2")
 		}
 		defer out.Close()
 		err = out.Chmod(0644)
@@ -89,24 +97,52 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	u2, err := uuid.NewV4()
 
 	if err != nil {
-		fmt.Println("contact_in_adminstartor")
+		fmt.Println("contact_in_adminstartor3")
 	}
-
-	filename := fmt.Sprintf("%s%s", u2, env.FichierDonnees.Format)
-	f, err := os.OpenFile("fichier/"+filename, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
+	name := fmt.Sprintf("%s%s%s", u2,".",env.FichierDonnees.Format)
+	filename := fmt.Sprintf("%s%s%s",path,"/", name)
+	err = ioutil.WriteFile(filename,file,0644)
+	
+	if err != nil {
+		fmt.Println("contact_in_adminstartor4")
+	}
+	// Read CSV File
+	csvData, err := ioutil.ReadFile("fichier/"+name)
 
 	if err != nil {
-		fmt.Println("contact_in_adminstartor")
+        panic(err)
+    }
+    buff := bytes.NewReader(csvData)
+	rec := csv.NewReader(buff)
+	rows := []map[string]string{}
+	var header []string
+	for {
+		record, err := rec.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+		if header == nil {
+			header = record
+		} else {
+			dict := map[string]string{}
+			for i := range header {
+				dict[header[i]] = record[i]
+			}
+			rows = append(rows, dict)
+		}
 	}
-	// don't forget to close it
-	defer f.Close()
+fmt.Println(rows)
 
-	fmt.Println(file)
-	//if os.IsNotExist(err) {
+	if err != nil {
+		log.Fatalf("r.Read() failed with '%s'\n", err)
+	}
 
-	// }
-
-	/*response, err := json.Marshal(payload)
+	resp.Code = 200
+	resp.Message = "file is success store"
+	response, err := json.Marshal(resp)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -114,8 +150,8 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	w.Write([]byte(response))*/
+	w.WriteHeader(resp.Code)
+	w.Write([]byte(response))
 }
 
 func Init() {
