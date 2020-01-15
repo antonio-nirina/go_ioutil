@@ -55,6 +55,7 @@ type Info struct {
 type Resp struct {
 	Code int `json:"code"`
 	Message string `json:"message"`
+	Data []map[string]string `json:"data"`
 }
 
 func main() {
@@ -77,7 +78,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("decode error:", err)
 		return
 	}
-	path := fmt.Sprintf("%s%s", filepath.Dir(""), "/fichier/")
+	path := fmt.Sprintf("%s%s", filepath.Dir(""), "/csv/")
 	filInfo, _ := os.Stat(path)
 
 	if filInfo == nil {
@@ -88,7 +89,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		out, err := os.Create(path)
 
 		if err != nil {
-			fmt.Println("contact_in_adminstartor2")
+			fmt.Println(err)
 		}
 		defer out.Close()
 		err = out.Chmod(0644)
@@ -107,11 +108,12 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("contact_in_adminstartor4")
 	}
 	// Read CSV File
-	csvData, err := ioutil.ReadFile("fichier/"+name)
+	csvData, err := ioutil.ReadFile("csv/"+name)
 
 	if err != nil {
         panic(err)
     }
+    bytes.Trim(csvData, "\xef\xbb\xbf")
     buff := bytes.NewReader(csvData)
 	rec := csv.NewReader(buff)
 	rows := []map[string]string{}
@@ -124,7 +126,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		if header == nil {
+		if len(header) == 0 {
 			header = record
 		} else {
 			dict := map[string]string{}
@@ -134,14 +136,14 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 			rows = append(rows, dict)
 		}
 	}
-fmt.Println(rows)
-
+fmt.Println("rrr", rows)
 	if err != nil {
 		log.Fatalf("r.Read() failed with '%s'\n", err)
 	}
 
 	resp.Code = 200
 	resp.Message = "file is success store"
+	resp.Data = rows
 	response, err := json.Marshal(resp)
 
 	if err != nil {
