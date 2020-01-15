@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/base64"
 	"encoding/csv"
@@ -13,6 +14,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	//"strings"
 	"time"
 	//"runtime"
 
@@ -53,9 +55,9 @@ type Info struct {
 }
 
 type Resp struct {
-	Code int `json:"code"`
-	Message string `json:"message"`
-	Data []map[string]string `json:"data"`
+	Code    int                 `json:"code"`
+	Message string              `json:"message"`
+	Data    []map[string]string `json:"data"`
 }
 
 func main() {
@@ -100,24 +102,33 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("contact_in_adminstartor3")
 	}
-	name := fmt.Sprintf("%s%s%s", u2,".",env.FichierDonnees.Format)
-	filename := fmt.Sprintf("%s%s%s",path,"/", name)
-	err = ioutil.WriteFile(filename,file,0644)
-	
+	name := fmt.Sprintf("%s%s%s", u2, ".", env.FichierDonnees.Format)
+	filename := fmt.Sprintf("%s%s%s", path, "/", name)
+	err = ioutil.WriteFile(filename, file, 0644)
+
 	if err != nil {
 		fmt.Println("contact_in_adminstartor4")
 	}
 	// Read CSV File
-	csvData, err := ioutil.ReadFile("csv/"+name)
+	csvData, err := ioutil.ReadFile("csv/" + name)
 
 	if err != nil {
-        panic(err)
-    }
-    bytes.Trim(csvData, "\xef\xbb\xbf")
-    buff := bytes.NewReader(csvData)
+		panic(err)
+	}
+
+	bytes.Trim(csvData, "\xef\xbb\xbf")
+	buff := bytes.NewReader(csvData)
+	s := bufio.NewScanner(buff)
+
+	for s.Scan() {
+		read_line := s.Text()
+		read_line = strings.TrimSuffix(read_line, "\n")
+		fmt.Println("ss", read_line)
+	}
 	rec := csv.NewReader(buff)
 	rows := []map[string]string{}
 	var header []string
+
 	for {
 		record, err := rec.Read()
 		if err == io.EOF {
@@ -126,7 +137,8 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		if len(header) == 0 {
+		header = record
+		/*if len(header) == 0 {
 			header = record
 		} else {
 			dict := map[string]string{}
@@ -134,9 +146,11 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 				dict[header[i]] = record[i]
 			}
 			rows = append(rows, dict)
-		}
+		}*/
+
 	}
-fmt.Println("rrr", rows)
+	fmt.Println("hhh", header)
+	// fmt.Println("rrr", rows)
 	if err != nil {
 		log.Fatalf("r.Read() failed with '%s'\n", err)
 	}
