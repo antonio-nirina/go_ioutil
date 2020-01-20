@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bufio"
+	//"bufio"
 	"bytes"
 	"encoding/base64"
 	"encoding/csv"
@@ -118,13 +118,18 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 	bytes.Trim(csvData, "\xef\xbb\xbf")
 	buff := bytes.NewReader(csvData)
-	s := bufio.NewScanner(buff)
+	// fmt.Println("ss", buff)
+	/*s := bufio.NewScanner(buff)
+	var read_line string
+	var array []string{}
 
 	for s.Scan() {
-		read_line := s.Text()
+		read_line = s.Text()
 		read_line = strings.TrimSuffix(read_line, "\n")
+		
 		fmt.Println("ss", read_line)
-	}
+
+	}*/
 	rec := csv.NewReader(buff)
 	rows := []map[string]string{}
 	var header []string
@@ -138,7 +143,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 			log.Fatal(err)
 		}
 		header = record
-		/*if len(header) == 0 {
+		if len(header) == 0 {
 			header = record
 		} else {
 			dict := map[string]string{}
@@ -146,11 +151,10 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 				dict[header[i]] = record[i]
 			}
 			rows = append(rows, dict)
-		}*/
-
+		}
 	}
-	fmt.Println("hhh", header)
-	// fmt.Println("rrr", rows)
+	
+	en fmt.Println("rrr", rows)
 	if err != nil {
 		log.Fatalf("r.Read() failed with '%s'\n", err)
 	}
@@ -177,70 +181,7 @@ func Init() {
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
-func tesst() {
-	ts := [...]float32{7, -10, 13, 8, 4, -7.2, -12, -3.7, 3.5, -9.6, 6.5, -1.7, -6.2, 7, 0.5, -0.3}
-	var pos []float32
-	var neg []float32
 
-	for _, val := range ts {
-		if val > 0 {
-			pos = append(pos, val)
-		} else {
-			neg = append(neg, val)
-		}
-
-	}
-
-	minPos := pos[0]
-	maxNeg := neg[0]
-
-	for _, valp := range pos {
-		if minPos > valp {
-			minPos = valp
-		}
-	}
-
-	for _, valn := range neg {
-		if maxNeg < valn {
-			maxNeg = valn
-		}
-	}
-
-	if minPos > (-1)*maxNeg {
-		fmt.Println(maxNeg)
-	} else {
-		fmt.Println(minPos)
-	}
-}
-
-func printer() {
-	for i := 1; i <= 20; i++ {
-		for j := 1; j <= 50; j++ {
-			if j > i {
-				for k := 1; k <= i; k++ {
-					fmt.Print("*")
-				}
-				break
-			} else {
-				fmt.Print("*")
-			}
-		}
-
-		fmt.Println("")
-	}
-
-	for m := 1; m <= 5; m++ {
-		for n := 1; n <= 25; n++ {
-			if n >= 20 {
-				fmt.Print("*")
-			} else {
-				fmt.Print(" ")
-			}
-		}
-
-		fmt.Println("")
-	}
-}
 
 // We need cmd.Run for execute command and Stdout for output
 
@@ -255,16 +196,7 @@ func showTimes() {
 	fmt.Println(now)
 }
 
-func monitor() {
-	cmd := exec.Command("pwd")
-	// cmd.Stdout = os.Stdout
-	// cmd.Stderr = os.Stderr
-	out, err := cmd.Output()
-	if err != nil {
-		log.Fatalf("cmd.Run() failed with %s\n", err)
-	}
-	fmt.Println(string(out))
-}
+
 
 func converterClient() {
 	fileName := "test_converter.docx"
