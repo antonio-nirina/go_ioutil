@@ -12,7 +12,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
+	//"os/exec"
 	"path/filepath"
 	//"strings"
 	"time"
@@ -60,7 +60,7 @@ type Resp struct {
 	Data    []map[string]string `json:"data"`
 }
 
-func main() {
+func main2() {
 	// printer()
 	Init()
 }
@@ -117,20 +117,17 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bytes.Trim(csvData, "\xef\xbb\xbf")
-	buff := bytes.NewReader(csvData)
-	// fmt.Println("ss", buff)
-	/*s := bufio.NewScanner(buff)
+	/*buff := bytes.NewReader(csvData)
+	s := bufio.NewScanner(buff)
 	var read_line string
-	var array []string{}
 
 	for s.Scan() {
 		read_line = s.Text()
 		read_line = strings.TrimSuffix(read_line, "\n")
-		
-		fmt.Println("ss", read_line)
-
-	}*/
-	rec := csv.NewReader(buff)
+	}
+	copy(csvData, read_line)*/
+	buff2 := bytes.NewReader(csvData)
+	rec := csv.NewReader(buff2)
 	rows := []map[string]string{}
 	var header []string
 
@@ -143,6 +140,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 			log.Fatal(err)
 		}
 		header = record
+
 		if len(header) == 0 {
 			header = record
 		} else {
@@ -153,8 +151,8 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 			rows = append(rows, dict)
 		}
 	}
-	
-	en fmt.Println("rrr", rows)
+	fmt.Println("rrr", header)
+	fmt.Println("hhhh", rows)
 	if err != nil {
 		log.Fatalf("r.Read() failed with '%s'\n", err)
 	}
@@ -180,8 +178,6 @@ func Init() {
 	fmt.Println("Run in 8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
-
-
 
 // We need cmd.Run for execute command and Stdout for output
 

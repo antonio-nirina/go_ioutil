@@ -1,9 +1,11 @@
-package process
+package main
 
 // https://stackoverflow.com/questions/47055584/how-to-start-and-monitor-and-kill-process-with-go
 import (
     "fmt"
     "os/exec"
+    "strconv"
+    "runtime"
 
     log "github.com/sirupsen/logrus"
 )
@@ -66,23 +68,23 @@ func (b *browserHandler) KillProcess() error {
 }
 
 func InitP() {
-    var pathToChromium string
-    var c = config.GetInstance()
+   // var pathToChromium string
+ //   var c = config.GetInstance()
     var os = runtime.GOOS
 
     if os == "windows" {
-        pathToChromium = "chromium-browser\\ChromiumPortable.exe"
+    //    pathToChromium = "chromium-browser\\ChromiumPortable.exe"
     } else {
-        pathToChromium = "chrome"
+    //    pathToChromium = "chrome"
     }
 
-    handler = newBrowserHandler(pathToChromium, c.GetConfig().PDVUrl)
+    //handler := newBrowserHandler(pathToChromium, c.GetConfig().PDVUrl)
 }
 
 func StartBrowser(done chan bool) {
     browserProcessListener := make(chan bool)
     defer close(browserProcessListener)
-    go handler.Start(browserProcessListener)
+    // go Start(browserProcessListener)
 
     var tryReopenBrowser = true
     for {
@@ -90,7 +92,7 @@ func StartBrowser(done chan bool) {
         case <-browserProcessListener:
             if tryReopenBrowser {
                 log.Warn("Browser process is stopped. Attempting to restart")
-                go handler.Start(browserProcessListener)
+               // go handler.Start(browserProcessListener)
             } else {
                 log.Warn("Browser process is stopped. Will not attempt to restart")
             }
@@ -98,7 +100,7 @@ func StartBrowser(done chan bool) {
         case <-done:
             log.Info("Shutting down browser")
             tryReopenBrowser = false
-            handler.KillProcess()
+//            handler.KillProcess()
             return
 
         default:

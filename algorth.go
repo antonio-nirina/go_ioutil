@@ -1,7 +1,9 @@
-package algo
+package main
 
 import(
 	"fmt"
+	"log"
+	"os/exec"
 )
 
 func tesst() {
