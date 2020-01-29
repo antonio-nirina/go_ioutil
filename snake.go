@@ -60,7 +60,7 @@ type Resp struct {
 	Data    []map[string]string `json:"data"`
 }
 
-func main2() {
+func main() {
 	// printer()
 	Init()
 }
@@ -130,6 +130,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	rec := csv.NewReader(buff2)
 	rows := []map[string]string{}
 	var header []string
+	var array []interface{}
 
 	for {
 		record, err := rec.Read()
@@ -144,15 +145,23 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		if len(header) == 0 {
 			header = record
 		} else {
-			dict := map[string]string{}
-			for i := range header {
-				dict[header[i]] = record[i]
-			}
-			rows = append(rows, dict)
+			// var dict []interface{}
+			array = append(array, header)
+			
 		}
 	}
-	fmt.Println("rrr", header)
-	fmt.Println("hhhh", rows)
+	fmt.Println("rrr", array[0])
+	dict := map[string]interface{}
+
+	for k,val := range array {
+		if k > 1 {
+			for _,v := range array[0] {
+				rows = append(rows, dict)
+			}	
+		}
+	}
+	
+	// fmt.Println("hhhh", rows)
 	if err != nil {
 		log.Fatalf("r.Read() failed with '%s'\n", err)
 	}
@@ -191,8 +200,6 @@ func showTimes() {
 	now := time.Now().Local()
 	fmt.Println(now)
 }
-
-
 
 func converterClient() {
 	fileName := "test_converter.docx"

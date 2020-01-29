@@ -4,8 +4,9 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
-	"os"
 	"io/ioutil"
+	"log"
+	//"os"
 	"regexp"
 	"strings"
 )
@@ -25,15 +26,16 @@ func (tr TrimReader) Read(bs []byte) (int, error) {
 	return len(trimmed), nil
 }
 
-func main() {
-	// csvfile, err := ioutil.ReadFile("csv/23680732-e3dd-40fb-a56c-562ce78a9de6.csv")
-	csvfile, err := os.Open("csv/23680732-e3dd-40fb-a56c-562ce78a9de6.csv")
+func main12() {
+	csvfile, err := ioutil.ReadFile("csv/a158cc8e-71bd-4edb-bdb6-d00e1b65ba25.csv")
 	if err != nil {
 		fmt.Println("contact_in_adminstartor1")
 	}
 
-	r := strings.NewReader(csvfile) // XXX: open the file instead...
+	r := strings.NewReader(string(csvfile))
 	rec := csv.NewReader(TrimReader{r})
+	rows := []map[string]string{}
+	var header []string
 
 	for {
 		record, err := rec.Read()
