@@ -14,13 +14,16 @@ import (
 	"os"
 	//"os/exec"
 	"path/filepath"
-	//"strings"
+	"strings"
 	"time"
 	//"runtime"
 
 	// "github.com/dghubble/sling"
 	"github.com/gofrs/uuid"
-	"github.com/gorilla/mux"
+	// "github.com/gorilla/mux"
+	"github.com/rs/xhandler"
+	"github.com/rs/xmux"
+	"golang.org/x/net/context"
 	// "github.com/nsf/termbox-go"
 )
 
@@ -65,7 +68,8 @@ func main() {
 	Init()
 }
 
-func HomeHandler(w http.ResponseWriter, r *http.Request) {
+func HomeHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+	fmt.Println(ctx)
 	env := Env{}
 	resp := Resp{}
 	err := json.NewDecoder(r.Body).Decode(&env)
@@ -130,7 +134,10 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	rec := csv.NewReader(buff2)
 	rows := []map[string]string{}
 	var header []string
+	var headerLst []string
 	var array []interface{}
+	var res []interface{}
+	var aHeader []interface{}
 
 	for {
 		record, err := rec.Read()
@@ -147,21 +154,53 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			// var dict []interface{}
 			array = append(array, header)
-			
 		}
 	}
-	fmt.Println("rrr", array[0])
-	dict := map[string]interface{}
+	/*
+		dict := map[string]string{}
+			for i := range header {
+				dict[header[i]] = record[i]
+			}
+			rows = append(rows, dict)
+	*/
 
+	// fmt.Println("rrr", array[0])
+	// fmt.Println("hhhh", array)
+	// var dict map[string]interface{}
+	
+	// rows = append(rows, dict)
+	
 	for k,val := range array {
-		if k > 1 {
-			for _,v := range array[0] {
-				rows = append(rows, dict)
-			}	
+		if k == 0 {
+			aHeader = append(aHeader, val)
 		}
 	}
-	
-	// fmt.Println("hhhh", rows)
+
+	var in string
+	var aIn string
+
+	for _,v := range aHeader {
+		for _,val := range v.([]string) {
+			in = val	
+		}	
+	}
+	headerLst = strings.Split(in,";")
+
+	for key,rs := range array {
+		if key > 0 {
+			res = append(res, rs)
+		}
+	}
+	fmt.Println("rrrr", res)
+
+	for _,v1 := range res {
+		for _,val1 := range v1.([]string) {
+			aIn = val1	
+		}	
+	}
+
+	fmt.Println("xxxx", headerLst)
+	fmt.Println("xxxx", aIn)
 	if err != nil {
 		log.Fatalf("r.Read() failed with '%s'\n", err)
 	}
@@ -182,10 +221,13 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func Init() {
-	r := mux.NewRouter()
-	r.HandleFunc("/", HomeHandler).Methods("POST")
+	// r := mux.NewRouter()
+	r := xmux.New()
+	c := xhandler.Chain{}
+	r.POST("/", xhandler.HandlerFuncC(HomeHandler))
 	fmt.Println("Run in 8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	// log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(":8080", c.Handler(r)))
 }
 
 // We need cmd.Run for execute command and Stdout for output
