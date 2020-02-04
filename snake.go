@@ -63,7 +63,7 @@ type Resp struct {
 	Data    []map[string]string `json:"data"`
 }
 
-func main() {
+func main25() {
 	// printer()
 	Init()
 }
@@ -167,9 +167,9 @@ func HomeHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	// fmt.Println("rrr", array[0])
 	// fmt.Println("hhhh", array)
 	// var dict map[string]interface{}
-	
+
 	// rows = append(rows, dict)
-	for k,val := range array {
+	for k, val := range array {
 		if k == 0 {
 			aHeader = append(aHeader, val)
 		}
@@ -179,36 +179,42 @@ func HomeHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	var aIn string
 	var az []interface{}
 
-	for _,v := range aHeader {
-		for _,val := range v.([]string) {
-			in = val	
-		}	
+	for _, v := range aHeader {
+		for _, val := range v.([]string) {
+			in = val
+		}
 	}
-	headerLst = strings.Split(in,";")
+	headerLst = strings.Split(in, ";")
 
-	for key,rs := range array {
+	for key, rs := range array {
 		if key > 0 {
 			res = append(res, rs)
 		}
 	}
 
-	for _,v1 := range res {
-		for _,val1 := range v1.([]string) {
-			aIn = val1	
-			az = append(az,strings.Split(aIn,";"))
-		}	
+	for _, v1 := range res {
+		for _, val1 := range v1.([]string) {
+			aIn = val1
+			az = append(az, strings.Split(aIn, ";"))
+		}
 	}
 
-	dict := map[string]string{}
+	/*dict := make(map[string]string)
 	for _,v := range headerLst {
 		for _,val2 := range az {
 			dict[v] = val2
 		}
 	}
-	rows = append(rows, dict)
-
+	rows = append(rows, dict)*/
 	fmt.Println("hhhh", headerLst)
-	fmt.Println("xxxx", az)
+	// sc := az[0]
+
+	for _, v21 := range az {
+		for _, v22 := range v21.([]string) {
+			fmt.Println("vvvv1", v22)
+		}
+	}
+
 	if err != nil {
 		log.Fatalf("r.Read() failed with '%s'\n", err)
 	}
