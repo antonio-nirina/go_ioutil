@@ -169,7 +169,6 @@ func HomeHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	// var dict map[string]interface{}
 	
 	// rows = append(rows, dict)
-	
 	for k,val := range array {
 		if k == 0 {
 			aHeader = append(aHeader, val)
@@ -178,6 +177,7 @@ func HomeHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 
 	var in string
 	var aIn string
+	var az []interface{}
 
 	for _,v := range aHeader {
 		for _,val := range v.([]string) {
@@ -191,16 +191,24 @@ func HomeHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 			res = append(res, rs)
 		}
 	}
-	fmt.Println("rrrr", res)
 
 	for _,v1 := range res {
 		for _,val1 := range v1.([]string) {
 			aIn = val1	
+			az = append(az,strings.Split(aIn,";"))
 		}	
 	}
 
-	fmt.Println("xxxx", headerLst)
-	fmt.Println("xxxx", aIn)
+	dict := map[string]string{}
+	for _,v := range headerLst {
+		for _,val2 := range az {
+			dict[v] = val2
+		}
+	}
+	rows = append(rows, dict)
+
+	fmt.Println("hhhh", headerLst)
+	fmt.Println("xxxx", az)
 	if err != nil {
 		log.Fatalf("r.Read() failed with '%s'\n", err)
 	}
