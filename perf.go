@@ -29,7 +29,7 @@ func NewMonitor(duration int) {
 	var m Monitor
 	var rtm runtime.MemStats
 	var interval = time.Duration(duration) * time.Second
-	// for
+	// for go routine
 	for {
 		<-time.After(interval)
 
