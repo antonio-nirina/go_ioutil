@@ -7,6 +7,7 @@ import (
 	"runtime"
 )
 
+//
 func InitFile() {
 	// path := "/home/nirina/Documents/golang/example/var/"
 	path := fmt.Sprintf("%s%s", filepath.Dir(""), "/var/")
