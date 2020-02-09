@@ -1,7 +1,7 @@
 #### Example Golang 
 ###### [Essential Golang](https://www.programming-books.io/essential/go/) 
 
-#### testjs https://stackblitz.com/edit/react-drrmuk?file=index.js
+#### example docker-compose https://github.com/master-atul/blog-docker-dev-environment-example
 
 
 L’intérêt grandissant autour de la Data Science et d’autres buzzwords tels que le « Machine Learning » ou la « Data visualization » nous a donné envie d’apporter des éclairages sur ce sujet. Cet article a pour ambition de dresser un portrait synthétique des étapes qui structurent tout projet de Data Science : définition des objectifs, collecte des données, nettoyage de ces dernières, construction d’hypothèses, identification des variables synthétiques, construction du modèle prédictif et présentation des résultats.
