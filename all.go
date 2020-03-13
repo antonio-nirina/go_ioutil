@@ -8,26 +8,31 @@ import (
 
 func main(){
 	var folder []string
+	var res [][]os.FileInfo
+	var list = make(map[string]interface{})
+	var result []interface{}
 	folder = append(folder,"csv")
 	folder = append(folder,"xcsv")
 	
 	for _,dirs := range folder {
 		if err := os.MkdirAll(dirs, 0755); err != nil {
-			fmt.Println(err)
+			fmt.Println("errr000",err)
 		}
-		content, err := ioutil.ReadDir("csv")
+		content, err := ioutil.ReadDir(dirs)
 		
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("errr22",err)
 		}
-
-		for _, f := range content {
-			info,err := os.Stat(f.Name())
-			if err != nil {
-				fmt.Println(err)
-			}
-        	fmt.Println(info)
-    	}
+		res = append(res,content)
 	}
+
+	for _, f := range res {
+		for _, val := range f {
+			list["name"] = val.Name()
+			list["date"] = val.ModTime()
+			result = append(result,list)
+	    }
+    }
+    fmt.Println("info", result)
 	
 }
