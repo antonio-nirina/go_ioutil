@@ -38,7 +38,7 @@ func (tr TrimReader) Read(bs []byte) (int, error) {
 	return len(trimmed), nil
 }
 
-func main() {
+func main111() {
 	Init1()
 }
 
